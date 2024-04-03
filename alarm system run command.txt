@@ -1,0 +1,5 @@
+- Optimizing hyperparameters (xgboost):
+python optimize_params_xgboost.py "Road_Traffic_Fine_Management_Process_labeled_cleaned" "C:\Users\eric.manintveld\OneDrive - Avanade\Thesis\Datasets\Road Traffic Fine Management Process_1_all
+
+- Training and predicting (xgboost):
+python write_xgboost_predictions.py "Road_Traffic_Fine_Management_Process_labeled_cleaned" "C:\Users\eric.manintveld\OneDrive - Avanade\Thesis\Datasets\Road Traffic Fine Management Process_1_all\optimal_params_xgboost_Road_Traffic_Fine_Management_Process_labeled_cleaned.pickle" "C:\Users\eric.manintveld\OneDrive - Avanade\Thesis\Datasets\Road Traffic Fine Management Process_1_all"

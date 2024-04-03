@@ -28,7 +28,27 @@ class AggregateTransformer(TransformerMixin):
         
         # transform numeric cols
         if len(self.num_cols) > 0:
-            dt_numeric = X.groupby(self.case_id_col)[self.num_cols].agg({'mean':np.mean, 'max':np.max, 'min':np.min, 'sum':np.sum, 'std':np.std})
+            print(self.num_cols)
+
+            #dt_numeric = X.groupby(self.case_id_col)[self.num_cols].agg({'mean':np.mean, 'max':np.max, 'min':np.min, 'sum':np.sum, 'std':np.std}) # Issue line
+
+            # Updated code
+
+            # Define the aggregation functions
+            aggregation_functions = {'mean': np.mean, 'max': np.max, 'min': np.min, 'sum': np.sum, 'std': np.std}
+
+            # Perform aggregation separately for each function
+            aggregated_dfs = []
+            for func_name, func in aggregation_functions.items():
+                aggregated_df = X.groupby(self.case_id_col)[self.num_cols].agg(func)
+                aggregated_df.columns = [f'{col}_{func_name}' for col in self.num_cols]
+                aggregated_dfs.append(aggregated_df)
+
+            # Concatenate the results along axis 1
+            dt_numeric = pd.concat(aggregated_dfs, axis=1)
+
+            # End updated code
+
             dt_numeric.columns = ['_'.join(col).strip() for col in dt_numeric.columns.values]
             
         # transform cat cols

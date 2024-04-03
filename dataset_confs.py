@@ -1,5 +1,6 @@
 import os
 
+# Initiate dictionary
 case_id_col = {}
 activity_col = {}
 resource_col = {}
@@ -13,8 +14,34 @@ dynamic_num_cols = {}
 static_num_cols = {}
 filename = {}
 
-logs_dir = "/gpfs/hpchome/etais/hpc_irheta/predictive-monitoring-benchmark/labeled_logs_csv_processed"
+# Set log directory
+logs_dir = "C:/Users/eric.manintveld/OneDrive - Avanade/Thesis/Datasets/Road Traffic Fine Management Process_1_all"
 
+### Eric's Traffic Fine settings ###
+
+dataset = "Road_Traffic_Fine_Management_Process_labeled_cleaned"
+
+case_id_col[dataset] = "case:concept:name"
+activity_col[dataset] = "concept:name"
+resource_col[dataset] = "org:resource"
+timestamp_col[dataset] = "Complete Timestamp"
+
+#labels
+label_col[dataset] = 'label'
+pos_label[dataset] = 'deviant'
+neg_label[dataset] = 'regular'
+
+#features for classifier
+dynamic_cat_cols[dataset] = ["org:resource", "lastSent", "notificationType", "dismissal"]
+static_cat_cols[dataset] = ["article", "vehicleClass"]
+dynamic_num_cols[dataset] = ["expense"]
+static_num_cols[dataset] = ["amount", "points"]
+
+filename[dataset] = os.path.join(logs_dir, "Road_Traffic_Fine_Management_Process_labeled_cleaned.csv")
+
+
+
+'''
 #### Traffic fines settings ####
 
 for formula in range(1,3):
@@ -35,10 +62,11 @@ for formula in range(1,3):
     static_cat_cols[dataset] = ["article", "vehicleClass"]
     dynamic_num_cols[dataset] = ["expense", "timesincelastevent", "timesincecasestart", "timesincemidnight", "event_nr", "month", "weekday", "hour"]
     static_num_cols[dataset] = ["amount", "points"]
-        
+'''       
 
 #### BPIC2017 settings ####
 
+'''
 bpic2017_dict = {"bpic2017_cancelled": "BPIC17_O_Cancelled.csv",
                  "bpic2017_accepted": "BPIC17_O_Accepted.csv",
                  "bpic2017_refused": "BPIC17_O_Refused.csv"
@@ -62,3 +90,4 @@ for dataset, fname in bpic2017_dict.items():
     static_cat_cols[dataset] = ['ApplicationType', 'LoanGoal']
     dynamic_num_cols[dataset] = ['FirstWithdrawalAmount', 'MonthlyCost', 'NumberOfTerms', 'OfferedAmount', 'CreditScore',  "timesincelastevent", "timesincecasestart", "timesincemidnight", "event_nr", "month", "weekday", "hour"]
     static_num_cols[dataset] = ['RequestedAmount']
+'''

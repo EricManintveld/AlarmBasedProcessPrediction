@@ -33,7 +33,7 @@ class DatasetManager:
         for col in self.dynamic_num_cols + self.static_num_cols:
             dtypes[col] = "float"
 
-        data = pd.read_csv(dataset_confs.filename[self.dataset_name], sep=";", dtype=dtypes)
+        data = pd.read_csv(dataset_confs.filename[self.dataset_name], sep=",", dtype=dtypes) # Set the correct seperator here
         data[self.timestamp_col] = pd.to_datetime(data[self.timestamp_col])
 
         return data
