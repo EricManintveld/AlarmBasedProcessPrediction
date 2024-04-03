@@ -1,8 +1,0 @@
-ERROR: scipy 1.7.3 has requirement numpy<1.23.0,>=1.16.5, but you'll have numpy 1.14.0 which is incompatible.
-ERROR: scikit-learn 1.0.2 has requirement numpy>=1.14.6, but you'll have numpy 1.14.0 which is incompatible.
-
-pip install numpy==1.14.0
-
-ERROR: xgboost 1.6.2 requires scipy, which is not installed.
-ERROR: lightgbm 4.3.0 requires scipy, which is not installed.
-ERROR: hyperopt 0.2.7 requires scipy, which is not installed.
