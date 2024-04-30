@@ -7,7 +7,7 @@ import numpy as np
 
 from sklearn.metrics import roc_auc_score
 from sklearn.pipeline import FeatureUnion
-from calibration import CalibratedClassifierCV
+from sklearn.calibration import CalibratedClassifierCV
 from imblearn.over_sampling import RandomOverSampler 
 
 from sklearn.metrics import brier_score_loss
@@ -20,6 +20,8 @@ import pickle
 
 import lightgbm as lgb
 
+import dataset_confs
+
 
 def create_model(param, n_lgbm_iter=100, calibrate=False):
     
@@ -30,6 +32,7 @@ def create_model(param, n_lgbm_iter=100, calibrate=False):
     if oversample:
         train_data = lgb.Dataset(X_train_ros, label=y_train_ros)
     else:
+        print("Shape right before training: " + str(X_train.shape))
         train_data = lgb.Dataset(X_train, label=y_train)
     lgbm = lgb.train(param, train_data, n_lgbm_iter)
     
@@ -64,9 +67,12 @@ start = time.time()
 # read the data
 dataset_manager = DatasetManager(dataset_name)
 data = dataset_manager.read_dataset()
+print(type(data))
+print("Shape after loading: " + str(data.shape))
 
 min_prefix_length = 1
 max_prefix_length = int(np.ceil(data.groupby(dataset_manager.case_id_col).size().quantile(0.9)))
+print("Max prefix length: " + str(max_prefix_length))
 
     
 cls_encoder_args = {'case_id_col': dataset_manager.case_id_col, 
@@ -75,30 +81,49 @@ cls_encoder_args = {'case_id_col': dataset_manager.case_id_col,
                     'dynamic_cat_cols': dataset_manager.dynamic_cat_cols,
                     'dynamic_num_cols': dataset_manager.dynamic_num_cols, 
                     'fillna': True}
+
+print("Encoder args: " + str(cls_encoder_args))
     
 # split into training and test
 if split_type == "temporal":
     train, test = dataset_manager.split_data_strict(data, train_ratio, split=split_type)
+    print("Shape after splitting data: " + str(train.shape))
 else:
     train, test = dataset_manager.split_data(data, train_ratio, split=split_type)
 
 train, val = dataset_manager.split_val(train, val_ratio)
+print("Shape after splitting val: " + str(train.shape))
     
 # generate data where each prefix is a separate instance
 dt_train_prefixes = dataset_manager.generate_prefix_data(train, min_prefix_length, max_prefix_length)
 dt_val_prefixes = dataset_manager.generate_prefix_data(val, min_prefix_length, max_prefix_length)
 dt_test_prefixes = dataset_manager.generate_prefix_data(test, min_prefix_length, max_prefix_length)
 
+print("Shape after generating prefix data (train): " + str(dt_train_prefixes.shape))
+print("Shape after generating prefix data (val): " + str(dt_val_prefixes.shape))
+print("Shape after generating prefix data (test): " + str(dt_test_prefixes.shape))
+
 # encode all prefixes
 feature_combiner = FeatureUnion([(method, EncoderFactory.get_encoder(method, **cls_encoder_args)) for method in ["static", "agg"]])
 X_train = feature_combiner.fit_transform(dt_train_prefixes)
+print("Shape after encoding prefixes: " + str(X_train.shape))
 X_test = feature_combiner.fit_transform(dt_test_prefixes)
+print("Shape after encoding prefixes: " + str(X_test.shape))
 y_train = dataset_manager.get_label_numeric(dt_train_prefixes)
 y_test = dataset_manager.get_label_numeric(dt_test_prefixes)
 X_val = feature_combiner.fit_transform(dt_val_prefixes)
+print("Shape after encoding prefixes: " + str(X_val.shape))
 y_val = dataset_manager.get_label_numeric(dt_val_prefixes)
 
+# Save encoder for later use.
+outfile = os.path.join(dataset_confs.logs_dir, "encoder_%s.pickle" % (dataset_name))
+# write to file
+with open(outfile, "wb") as fout:
+    pickle.dump(feature_combiner, fout)
+
+
 if oversample:
+    print("Oversample, this shouldnt print")
     ros = RandomOverSampler(random_state=42)
     X_train_ros, y_train_ros = ros.fit_sample(X_train, y_train)
 

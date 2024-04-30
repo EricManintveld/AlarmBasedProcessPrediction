@@ -15,7 +15,7 @@ static_num_cols = {}
 filename = {}
 
 # Set log directory
-logs_dir = "C:/Users/eric.manintveld/OneDrive - Avanade/Thesis/Datasets/Road Traffic Fine Management Process_1_all"
+logs_dir = "C:\\Users\\eric.manintveld\\OneDrive - Avanade\\Thesis\\Datasets\\Road Traffic Fine Management Process_1_all"
 
 ### Eric's Traffic Fine settings ###
 
